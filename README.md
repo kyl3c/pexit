@@ -2,7 +2,7 @@
 
 This script was written with the specific goal to recursively find and remove EXIF data.
 
-Exchangeable image file format (EXIF) data contains metadata about images, including anything from the camera's aperature to the GPS cooridinates of where the photo was taken and more. This info is used by digital cameras and smartphones alike to present and utilize relevant information about a picture. Though most of the time, this info is not relevant. This application will recursively locate such metadata for images within in the current working directory and its subdirectories, print it out, and then remove the data.
+Exchangeable image file format (EXIF) data contains metadata about images, including anything from the camera's aperature to the GPS cooridinates of where the photo was taken and more. This info is used by digital cameras and smartphones alike to present and utilize relevant information about a picture. Though most of the time, this info is not relevant. This application will recursively locate such metadata for images within the current working directory and its subdirectories, print it out, and then remove the data.
 
 <br/>
 
