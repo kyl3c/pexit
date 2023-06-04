@@ -2,68 +2,75 @@
 
 import logging
 import os
+import sys
 from PIL import Image, ExifTags
 
-IMAGE_EXTENSIONS = [".jpg", ".jpeg", ".png", ".tif", ".tiff", ".bmp"]
+EXTENSIONS = [".jpg", ".jpeg", ".png", ".tif", ".tiff", ".bmp"]
 
-def print_exif_data(image):
-    """Prints the EXIF data of a PIL Image object."""
+run_date = datetime.now().strftime("%Y-%m-%d_%H-%M")
+log_filename = f"logfile_{run_date}.log"
+
+logging.basicConfig(
+    level=logging.INFO, 
+    handlers=[
+        logging.FileHandler(log_filename),  # write logs to file
+        logging.StreamHandler(sys.stdout)  # write logs to standard out(CLI)
+    ]
+)
+
+def pexit_exif_print(image):
     exif_data = image._getexif()
     if exif_data is not None:
-        logging.info("------ EXIF Data ------")
+        logging.info("~ EXIF present on " + image.filename)
         for tag, value in exif_data.items():
             tag_name = ExifTags.TAGS.get(tag, tag)
             logging.info(f"{tag_name}: {value}")
     else:
-        logging.info("The image does not have any EXIF data.")
+        logging.info("! no EXIF data present on " + image.filename)
 
-def remove_exif(image):
-    """Removes the EXIF data from a PIL Image object and returns the modified image."""
+def pexit_exif_remove(image):
     if "exif" in image.info:
         image_without_exif = image._copy()
         return image_without_exif
     else:
-        logging.info("The image does not have any EXIF data.")
+        logging.info("! no EXIF data present on " + image)
         return image
 
-def process_image(image_path):
-    """Opens an image file and removes its EXIF data."""
+def pexit_process_remove(image_path):
     try:
         with Image.open(image_path) as image:
-            print_exif_data(image)
-            image_without_exif = remove_exif(image)
-        
-        # Define the new image path, check if it exists and modify it if necessary.
-        directory, filename = os.path.split(image_path)
-        base, ext = os.path.splitext(filename)
-        new_image_path = os.path.join(directory, base + "_no_exif" + ext)
+            pexit_exif_print(image)
+            image_without_exif = pexit_exif_remove(image)
 
-        if os.path.isfile(new_image_path):
-            new_image_path = os.path.join(directory, "output_" + base + "_no_exif" + ext)
+        directory, filename = os.path.split(image_path) 
+        base, ext = os.path.splitext(filename)
+        new_image_path = os.path.join(directory, base + "_no_exif" + ext) # defines an image path
+
+        if os.path.isfile(new_image_path): # checks if file path exists
+            new_image_path = os.path.join(directory, "output_" + base + "_no_exif" + ext) # adjusts if so
 
         image_without_exif.save(new_image_path)
-        logging.info("EXIF data has been removed. The new image is saved as %s", new_image_path)
+        logging.info("+ new image saved at " + new_image_path + '\n')
 
         with Image.open(new_image_path) as modified_image:
-            logging.info("------ EXIF Data After Removal ------")
-            print_exif_data(modified_image)
+            logging.info(" — removed EXIF data from "+ new_image_path + '\n')
+            pexit_exif_print(modified_image)
 
     except FileNotFoundError:
-        logging.error("The file was not found. Please check the file path: %s", image_path)
+        logging.error("! file was not found, verify this file exists: " + image_path)
     except PermissionError:
-        logging.error("You do not have permission to access this file: %s", image_path)
+        logging.error("! you do not have permission to access this file: " + image_path)
     except IOError:
-        logging.error("An error occurred while trying to open this file: %s", image_path)
+        logging.error("! an error occurred trying to open this file: " + image_path)
     except Exception as e:
-        logging.error("Unexpected error:", exc_info=True)
+        logging.error("! unexpected error: ", exc_info=True)
 
-def find_and_process_images():
-    """Finds all images in the current directory and its subdirectories, and removes their EXIF data."""
+def pexit_exif_discover():
     for dirpath, dirnames, filenames in os.walk("."):
         for filename in filenames:
-            if any(filename.lower().endswith(ext) for ext in IMAGE_EXTENSIONS):
+            if any(filename.lower().endswith(ext) for ext in EXTENSIONS):
                 image_path = os.path.join(dirpath, filename)
-                process_image(image_path)
+                pexit_process_remove(image_path)
 
 if __name__ == "__main__":
-    find_and_process_images()
+    pexit_exif_discover()
