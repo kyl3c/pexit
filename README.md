@@ -14,30 +14,6 @@ Exchangeable image file format (EXIF) data contains metadata about images, inclu
 
 <br/>
 
-## Requirements
-
-This application requires Python 3.8+ and the following Python libraries installed:
-
-* PIL for image processing
-
-You can install these requirements by running 
-```python   
-pip install -r requirements.txt.
-```
-
-<br/>
-
-## Usage
-
-To use this application, simply run the script from your command line from within the target directory:
-```python
-python pexit.py
-```
-
-<br/>
-  
-#### All images in the current directory and its subdirectories with these file types will be processed at run time:
-
   | Supported File Types  | 
   | :----:        |    
   |    .jpg      |
@@ -47,6 +23,34 @@ python pexit.py
   |    .tiff      |
   |    .bmp      |
 
+<br/>
+
+## Pre-requisites
+
+* Python 3.8+ 
+
+* Python Pillow (PIL) 
+
+    ```python   
+    pip install pillow
+    ```
+
+<br/>
+  
+## Installation
+
+No installation is required for this script. Clone the repository into a target directory and run the Python script (pexit.py) 
+
+<br/>
+
+## Usage
+
+When ran, the script processes all images in the current directory and its subdirectories with the supported file types
+
+  ```python
+  python pexit.py
+  ```
+    
 <br/>
 
 ## Notes
