@@ -4,6 +4,7 @@ import logging
 import os
 import sys
 from PIL import Image, ExifTags
+from datetime import datetime
 
 EXTENSIONS = [".jpg", ".jpeg", ".png", ".tif", ".tiff", ".bmp"]
 
@@ -11,7 +12,7 @@ run_date = datetime.now().strftime("%Y-%m-%d_%H-%M")
 log_filename = f"logfile_{run_date}.log"
 
 logging.basicConfig(
-    level=logging.INFO, 
+    level=logging.INFO,
     handlers=[
         logging.FileHandler(log_filename),  # write logs to file
         logging.StreamHandler(sys.stdout)  # write logs to standard out(CLI)
@@ -29,12 +30,15 @@ def pexit_exif_print(image):
         logging.info("! no EXIF data present on " + image.filename)
 
 def pexit_exif_remove(image):
-    if "exif" in image.info:
-        image_without_exif = image._copy()
-        return image_without_exif
-    else:
-        logging.info("! no EXIF data present on " + image)
-        return image
+
+    data = list(image.getdata())
+    image_without_exif = Image.new(image.mode, image.size)
+    image_without_exif.putdata(data)
+
+    if hasattr(image, 'filename'):
+        image_without_exif.filename = image.filename
+
+    return image_without_exif
 
 def pexit_process_remove(image_path):
     try:
@@ -42,7 +46,7 @@ def pexit_process_remove(image_path):
             pexit_exif_print(image)
             image_without_exif = pexit_exif_remove(image)
 
-        directory, filename = os.path.split(image_path) 
+        directory, filename = os.path.split(image_path)
         base, ext = os.path.splitext(filename)
         new_image_path = os.path.join(directory, base + "_no_exif" + ext) # defines an image path
 
